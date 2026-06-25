@@ -1,11 +1,7 @@
+import axios from "axios";
 import type { WorkflowApiResponse } from "../types/api";
 
-const API_URL =
-  import.meta.env.VITE_API_URL ??
-  "https://cpab.cogitx.ai/project/exports/rest-api/6a016bf971e1d54ed336d155/jobs";
-const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
-const CLIENT_SECRET = import.meta.env.VITE_CLIENT_SECRET;
-const HTTP_METHOD = "POST" as const;
+const API_URL = "/api/jobs";
 
 export class ApiError extends Error {
   constructor(
@@ -17,38 +13,52 @@ export class ApiError extends Error {
   }
 }
 
+function parseErrorMessage(data: unknown): string {
+  if (typeof data === "string") {
+    try {
+      const parsed = JSON.parse(data) as { message?: string; data?: string };
+      return parsed.message ?? parsed.data ?? data;
+    } catch {
+      return data;
+    }
+  }
+
+  if (data && typeof data === "object") {
+    const record = data as { message?: string; data?: string };
+    return record.message ?? record.data ?? "Request failed.";
+  }
+
+  return "Request failed.";
+}
+
 export async function sendChatMessage(text: string): Promise<WorkflowApiResponse> {
-  if (!CLIENT_ID || !CLIENT_SECRET) {
-    throw new ApiError(
-      "Missing API configuration. Check your .env file for VITE_CLIENT_ID and VITE_CLIENT_SECRET."
+  try {
+    const { data } = await axios.post<WorkflowApiResponse>(
+      API_URL,
+      { text },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
+
+    if (!data.data?.success) {
+      throw new ApiError(data.message || "Workflow execution failed.");
+    }
+
+    return data;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      const message = parseErrorMessage(error.response?.data ?? error.message);
+      throw new ApiError(message, status);
+    }
+
+    throw new ApiError("Something went wrong. Please try again.");
   }
-
-  const request = new Request(API_URL, {
-    method: HTTP_METHOD,
-    headers: {
-      "Content-Type": "application/json",
-      "x-client-id": CLIENT_ID,
-      "x-client-secret": CLIENT_SECRET,
-    },
-    body: JSON.stringify({ text }),
-  });
-
-  const response = await fetch(request);
-
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => "");
-    throw new ApiError(
-      errorText || `Request failed with status ${response.status}`,
-      response.status
-    );
-  }
-
-  const data = (await response.json()) as WorkflowApiResponse;
-
-  if (!data.data?.success) {
-    throw new ApiError(data.message || "Workflow execution failed.");
-  }
-
-  return data;
 }
