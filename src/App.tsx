@@ -9,6 +9,7 @@ import {
   extractMessageFromResponse,
   extractProductsFromResponse,
 } from "./utils/parseProducts";
+import { buildAssistantMessage } from "./utils/parseMessage";
 
 function createId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -17,7 +18,7 @@ function createId(): string {
 const WELCOME_MESSAGE: ChatMessage = {
   id: "welcome",
   role: "assistant",
-  text: "Hi! I'm your grocery shopping assistant. Tell me what you'd like to cook — for example, \"Ingredients to make samosa\" — and I'll help you find the right items from our store.",
+  text: "Hi! I'm your Yucart shopping assistant. Tell me what you'd like to cook — for example, \"Ingredients to make samosa\" — and I'll help you find the right items from our store.",
   timestamp: new Date(),
 };
 
@@ -50,12 +51,17 @@ export default function App() {
 
     try {
       const response = await sendChatMessage(text);
+      const parsed = buildAssistantMessage(
+        extractMessageFromResponse(response),
+        extractProductsFromResponse(response)
+      );
       const assistantMessage: ChatMessage = {
         id: createId(),
         role: "assistant",
-        text: extractMessageFromResponse(response),
+        text: parsed.text,
         timestamp: new Date(),
-        products: extractProductsFromResponse(response),
+        products: parsed.products,
+        productSectionTitle: parsed.productSectionTitle,
         durationMs: extractDurationMs(response),
       };
       setMessages((prev) => [...prev, assistantMessage]);

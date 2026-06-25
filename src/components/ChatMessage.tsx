@@ -1,4 +1,5 @@
 import type { ChatMessage } from "../types/api";
+import { MarkdownContent } from "./MarkdownContent";
 import { ProductCard } from "./ProductCard";
 
 interface ChatMessageBubbleProps {
@@ -11,6 +12,7 @@ function formatTime(date: Date): string {
 
 export function ChatMessageBubble({ message }: ChatMessageBubbleProps) {
   const isUser = message.role === "user";
+  const showProducts = !isUser && message.products && message.products.length > 0;
 
   return (
     <div
@@ -34,7 +36,7 @@ export function ChatMessageBubble({ message }: ChatMessageBubbleProps) {
                 />
               </svg>
             </div>
-            <span className="text-xs font-medium text-stone-500">FreshCart AI</span>
+            <span className="text-xs font-medium text-stone-500">Yucart AI</span>
             {message.durationMs && (
               <span className="text-[10px] text-stone-400">
                 · {(message.durationMs / 1000).toFixed(1)}s
@@ -43,15 +45,20 @@ export function ChatMessageBubble({ message }: ChatMessageBubbleProps) {
           </div>
         )}
 
-        <div
-          className={`rounded-2xl px-4 py-3 text-[15px] leading-relaxed ${
-            isUser
-              ? "rounded-br-md bg-brand-600 text-white shadow-sm shadow-brand-600/20"
-              : "rounded-bl-md border border-stone-200 bg-white text-stone-800 shadow-sm"
-          }`}
-        >
-          <p className="whitespace-pre-wrap">{message.text}</p>
-        </div>
+        {message.text && (
+          <div
+            className={`rounded-2xl px-4 py-3 ${
+              isUser
+                ? "rounded-br-md bg-brand-600 text-white shadow-sm shadow-brand-600/20"
+                : "rounded-bl-md border border-stone-200 bg-white shadow-sm"
+            }`}
+          >
+            <MarkdownContent
+              content={message.text}
+              variant={isUser ? "user" : "default"}
+            />
+          </div>
+        )}
 
         <p
           className={`mt-1.5 text-[11px] text-stone-400 ${isUser ? "text-right" : ""}`}
@@ -59,13 +66,13 @@ export function ChatMessageBubble({ message }: ChatMessageBubbleProps) {
           {formatTime(message.timestamp)}
         </p>
 
-        {!isUser && message.products && message.products.length > 0 && (
+        {showProducts && (
           <div className="mt-4">
             <p className="mb-2 text-xs font-medium uppercase tracking-wider text-stone-500">
-              Suggested items from store
+              {message.productSectionTitle ?? "Suggested items from store"}
             </p>
             <div className="flex gap-3 overflow-x-auto pb-2 chat-scroll">
-              {message.products.map((product) => (
+              {message.products!.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>

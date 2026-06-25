@@ -20,7 +20,7 @@ export function Header() {
           </div>
           <div>
             <h1 className="text-lg font-semibold tracking-tight text-stone-900">
-              Fresh<span className="font-serif italic text-brand-600">Cart</span>
+              Yu<span className="font-serif italic text-brand-600">cart</span>
             </h1>
             <p className="text-xs text-stone-500">Conversational grocery shopping</p>
           </div>

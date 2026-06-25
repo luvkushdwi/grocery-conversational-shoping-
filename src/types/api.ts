@@ -2,11 +2,12 @@ export interface GroceryProduct {
   id: string;
   name: string;
   description: string;
-  variant: string;
-  price: number;
-  category: string;
-  unit: string;
-  imageUrl: string;
+  variant?: string;
+  price?: number;
+  priceLabel?: string;
+  category?: string;
+  unit?: string;
+  imageUrl?: string;
 }
 
 export interface ChatMessage {
@@ -15,6 +16,7 @@ export interface ChatMessage {
   text: string;
   timestamp: Date;
   products?: GroceryProduct[];
+  productSectionTitle?: string;
   intent?: string;
   durationMs?: number;
 }
