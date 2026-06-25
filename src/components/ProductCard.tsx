@@ -1,11 +1,9 @@
 import type { GroceryProduct } from "../types/api";
+import { GENERIC_GROCERY_IMAGE, resolveProductImage } from "../utils/productImages";
 
 interface ProductCardProps {
   product: GroceryProduct;
 }
-
-const PLACEHOLDER_IMAGE =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 150' fill='%23f5f5f4'%3E%3Crect width='200' height='150' fill='%23e7e5e4'/%3E%3Cpath d='M72 58h56v34H72z' fill='%23d6d3d1'/%3E%3Ccircle cx='88' cy='48' r='10' fill='%23d6d3d1'/%3E%3Cpath d='M60 92l24-22 18 16 26-28 32 34v12H60z' fill='%23a8a29e'/%3E%3C/svg%3E";
 
 function formatPrice(product: GroceryProduct): string {
   if (product.priceLabel) return product.priceLabel;
@@ -20,22 +18,31 @@ function formatPrice(product: GroceryProduct): string {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const hasImage = Boolean(product.imageUrl);
+  const imageSrc = resolveProductImage(product.name, product.imageUrl, product.category);
+  const usingDummyImage = !product.imageUrl || imageSrc !== product.imageUrl;
 
   return (
     <article className="group flex w-60 shrink-0 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:border-brand-200 hover:shadow-md">
       <div className="relative aspect-[4/3] overflow-hidden bg-stone-100">
         <img
-          src={product.imageUrl ?? PLACEHOLDER_IMAGE}
+          src={imageSrc}
           alt={product.name}
-          className={`h-full w-full object-cover transition duration-300 ${
-            hasImage ? "group-hover:scale-105" : "scale-95 opacity-80"
-          }`}
+          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
           loading="lazy"
           onError={(e) => {
-            e.currentTarget.src = PLACEHOLDER_IMAGE;
+            const fallback = resolveProductImage(product.name, undefined, product.category);
+            if (e.currentTarget.src !== fallback) {
+              e.currentTarget.src = fallback;
+              return;
+            }
+            e.currentTarget.src = GENERIC_GROCERY_IMAGE;
           }}
         />
+        {usingDummyImage && (
+          <span className="absolute right-2 top-2 rounded-full bg-black/45 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+            Stock image
+          </span>
+        )}
         {product.category && (
           <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-stone-600 backdrop-blur-sm">
             {product.category}
