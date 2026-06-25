@@ -47,7 +47,7 @@ export function MarkdownContent({ content, variant = "default" }: MarkdownConten
               target="_blank"
               rel="noreferrer"
               className={`underline underline-offset-2 ${
-                isUser ? "text-brand-100" : "text-brand-700"
+                isUser ? "text-brand-100" : "text-brand-600"
               }`}
             >
               {children}

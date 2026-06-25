@@ -3,6 +3,8 @@ import { GENERIC_GROCERY_IMAGE, resolveProductImage } from "../utils/productImag
 
 interface ProductCardProps {
   product: GroceryProduct;
+  displayImageUrl: string;
+  usingDummyImage: boolean;
 }
 
 function formatPrice(product: GroceryProduct): string {
@@ -17,15 +19,12 @@ function formatPrice(product: GroceryProduct): string {
   return "Price unavailable";
 }
 
-export function ProductCard({ product }: ProductCardProps) {
-  const imageSrc = resolveProductImage(product.name, product.imageUrl, product.category);
-  const usingDummyImage = !product.imageUrl || imageSrc !== product.imageUrl;
-
+export function ProductCard({ product, displayImageUrl, usingDummyImage }: ProductCardProps) {
   return (
     <article className="group flex w-60 shrink-0 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:border-brand-200 hover:shadow-md">
       <div className="relative aspect-[4/3] overflow-hidden bg-stone-100">
         <img
-          src={imageSrc}
+          src={displayImageUrl}
           alt={product.name}
           className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
           loading="lazy"
@@ -35,7 +34,7 @@ export function ProductCard({ product }: ProductCardProps) {
               e.currentTarget.src = fallback;
               return;
             }
-            e.currentTarget.src = GENERIC_GROCERY_IMAGE;
+            e.currentTarget.src = GENERIC_GROCERY_IMAGE[0];
           }}
         />
         {usingDummyImage && (
@@ -62,7 +61,7 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
 
         <div className="mt-auto pt-3">
-          <p className="text-sm font-bold text-brand-700">{formatPrice(product)}</p>
+          <p className="text-sm font-bold text-brand-600">{formatPrice(product)}</p>
           {product.unit && (
             <p className="text-[10px] text-stone-400">per {product.unit}</p>
           )}

@@ -59,7 +59,7 @@ export function ChatInput({
             type="button"
             onClick={onSubmit}
             disabled={disabled || !value.trim()}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white transition hover:bg-brand-700 active:scale-95 disabled:cursor-not-allowed disabled:bg-stone-300"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white transition hover:bg-brand-600 active:scale-95 disabled:cursor-not-allowed disabled:bg-stone-300"
             aria-label="Send message"
           >
             <svg
