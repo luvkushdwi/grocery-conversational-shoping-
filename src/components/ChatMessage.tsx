@@ -1,21 +1,15 @@
-import type { ChatMessage, GroceryProduct } from "../types/api";
+import type { ChatMessage } from "../types/api";
 import { ProductCard } from "./ProductCard";
 
 interface ChatMessageBubbleProps {
   message: ChatMessage;
-  cartProductIds: Set<string>;
-  onAddToCart: (product: GroceryProduct) => void;
 }
 
 function formatTime(date: Date): string {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-export function ChatMessageBubble({
-  message,
-  cartProductIds,
-  onAddToCart,
-}: ChatMessageBubbleProps) {
+export function ChatMessageBubble({ message }: ChatMessageBubbleProps) {
   const isUser = message.role === "user";
 
   return (
@@ -72,12 +66,7 @@ export function ChatMessageBubble({
             </p>
             <div className="flex gap-3 overflow-x-auto pb-2 chat-scroll">
               {message.products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  inCart={cartProductIds.has(product.id)}
-                  onAdd={onAddToCart}
-                />
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           </div>

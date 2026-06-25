@@ -2,8 +2,6 @@ import type { GroceryProduct } from "../types/api";
 
 interface ProductCardProps {
   product: GroceryProduct;
-  inCart: boolean;
-  onAdd: (product: GroceryProduct) => void;
 }
 
 function formatPrice(price: number): string {
@@ -14,7 +12,7 @@ function formatPrice(price: number): string {
   }).format(price);
 }
 
-export function ProductCard({ product, inCart, onAdd }: ProductCardProps) {
+export function ProductCard({ product }: ProductCardProps) {
   return (
     <article className="group flex w-56 shrink-0 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:border-brand-200 hover:shadow-md">
       <div className="relative aspect-[4/3] overflow-hidden bg-stone-100">
@@ -42,25 +40,11 @@ export function ProductCard({ product, inCart, onAdd }: ProductCardProps) {
         </p>
         <p className="mt-1 text-[11px] text-stone-400">{product.variant}</p>
 
-        <div className="mt-auto flex items-center justify-between pt-3">
-          <div>
-            <p className="text-sm font-bold text-brand-700">
-              {formatPrice(product.price)}
-            </p>
-            <p className="text-[10px] text-stone-400">per {product.unit}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => onAdd(product)}
-            disabled={inCart}
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-              inCart
-                ? "bg-brand-100 text-brand-700"
-                : "bg-brand-600 text-white hover:bg-brand-700 active:scale-95"
-            }`}
-          >
-            {inCart ? "Added" : "Add"}
-          </button>
+        <div className="mt-auto pt-3">
+          <p className="text-sm font-bold text-brand-700">
+            {formatPrice(product.price)}
+          </p>
+          <p className="text-[10px] text-stone-400">per {product.unit}</p>
         </div>
       </div>
     </article>

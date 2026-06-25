@@ -3,7 +3,7 @@ import { ChatInput } from "./components/ChatInput";
 import { ChatMessageBubble, TypingIndicator } from "./components/ChatMessage";
 import { Header } from "./components/Header";
 import { ApiError, sendChatMessage } from "./services/api";
-import type { ChatMessage, GroceryProduct } from "./types/api";
+import type { ChatMessage } from "./types/api";
 import {
   extractDurationMs,
   extractMessageFromResponse,
@@ -26,10 +26,7 @@ export default function App() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [cart, setCart] = useState<GroceryProduct[]>([]);
   const chatEndRef = useRef<HTMLDivElement>(null);
-
-  const cartProductIds = new Set(cart.map((p) => p.id));
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -73,27 +70,15 @@ export default function App() {
     }
   }, [input, isLoading]);
 
-  const handleAddToCart = (product: GroceryProduct) => {
-    setCart((prev) => {
-      if (prev.some((p) => p.id === product.id)) return prev;
-      return [...prev, product];
-    });
-  };
-
   return (
     <div className="flex h-full flex-col bg-gradient-to-b from-brand-50/50 via-stone-50 to-stone-100">
-      <Header cartCount={cart.length} />
+      <Header />
 
       <main className="flex flex-1 flex-col overflow-hidden">
         <div className="chat-scroll flex-1 overflow-y-auto">
           <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6">
             {messages.map((message) => (
-              <ChatMessageBubble
-                key={message.id}
-                message={message}
-                cartProductIds={cartProductIds}
-                onAddToCart={handleAddToCart}
-              />
+              <ChatMessageBubble key={message.id} message={message} />
             ))}
 
             {isLoading && <TypingIndicator />}
